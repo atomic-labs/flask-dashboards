@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>{{ title }}</title>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="//nvd3.org/nv.d3.js"></script>
+    <link rel="stylesheet" href="http://nvd3.org/src/nv.d3.css"/>
+
+    <script type="text/javascript" src="{{ url_for('.javascripts') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('.stylesheets') }}"/>
+  </head>
+  <body>
+    <div id="container">
+      {% block dashboard %}{% endblock %}
+    </div>
+  </body>
+</html>

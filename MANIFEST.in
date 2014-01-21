@@ -1,0 +1,3 @@
+include REQUIREMENTS.txt
+recursive-include flask_dashboards/templates *
+recursive-include flask_dashboards/static *

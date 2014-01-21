@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Job List</title>
+  </head>
+  <body>
+    <ul>
+      {% for name in jobs %}
+      <li><a href="{{ url_for('.job_execute', name=name) }}">{{ name }}</a> - {{ jobs[name] }}</li>
+      {% endfor %}
+    <ul>
+  </body>
+</html>
