@@ -106,9 +106,15 @@ class Dashboards(object):
             return render_template("job_list.html",
                                    jobs=self._scheduler.schedules())
 
-        @mod.route("/jobs/<name>/execute")
+        @mod.route("/jobs/<name>/execute", methods=["POST"])
         def job_execute(name):
             self._scheduler.execute(name)
+            return Response(status=200)
+
+        @mod.route("/jobs/execute", methods=["POST"])
+        def job_execute_all():
+            for j in self._scheduler.schedules():
+                self._scheduler.execute(j)
             return Response(status=200)
 
         @mod.route("/jobs/<name>/data")
