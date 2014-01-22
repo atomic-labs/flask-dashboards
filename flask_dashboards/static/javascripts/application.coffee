@@ -1,27 +1,30 @@
-bar_chart = (div, data) ->
+set_conversion_funcs = (chart, data) ->
+    if not data.x_axis_conversion?
+        data["x_axis_conversion"] = "default"
+
+    switch data["x_axis_conversion"]
+        when "date"
+            chart.x (d) -> new Date(d[0]).getTime()
+            chart.xAxis.tickFormat (d) -> d3.time.format('%b %d')(new Date(d))
+        else
+            chart.x (d) -> d[0]
+
+    chart.y (d) -> d[1]
+
+create_chart = (div, data) ->
     nv.addGraph ->
-        chart = nv.models.discreteBarChart()
-            .x((d) -> d[0])
-            .y((d) -> d[1])
+        switch div.getAttribute "dash-chart-type"
+            when "bar" then chart = nv.models.discreteBarChart()
+            when "line" then chart = nv.models.lineChart()
+            else
+                console.log "Unknown chart type: " +
+                    div.getAttribute "dash-chart-type"
+                return
 
-        svg = $ "<svg style='height:300px; width:400px'>"
-        $(div).append svg
-        d3.select(div).select("svg").datum(data).transition().duration(500).call(chart)
+        # TODO(ben): Assumes all series has same axis type as first series
+        set_conversion_funcs chart, data[0]
 
-        nv.utils.windowResize ->
-            chart.update()
-        chart
-
-line_chart = (div, data) ->
-    nv.addGraph ->
-        chart = nv.models.lineChart()
-            .x((d) -> d[0])
-            .y((d) -> d[1])
-        chart.xAxis.axisLabel("X Axis")
-            .tickFormat d3.format(",r")
-        chart.yAxis.axisLabel("Y Axis")
-            .tickFormat d3.format(".02f")
-        svg = $ "<svg style='height:300px; width:400px'>"
+        svg = $ "<svg sytle='width: 100%; height: 100%;'></svg>"
         $(div).append svg
         d3.select(div).select("svg").datum(data).transition().duration(500).call(chart)
 
@@ -35,9 +38,7 @@ get_data = (div) ->
 
     request = $.get "../jobs/" + data_name + "/data", "",
         (data) ->
-            switch div.getAttribute("dash-chart-type")
-                when "bar" then bar_chart div, data
-                when "line" then line_chart div, data
+            create_chart div, data
 
 $(document).ready ->
     for div in $ "div[dash-source]"

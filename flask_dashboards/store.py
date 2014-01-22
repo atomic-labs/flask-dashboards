@@ -20,6 +20,12 @@ def validate(data_set):
             logger.debug("Missing required attribute: values")
             return False
 
+        if ("x_axis_conversion" in ds
+            and ds["x_axis_conversion"] not in ("date", "default")):
+            logger.debug("Unknown value for "
+                         "x_axis_conversion: %s" % ds["x_axis_conversion"])
+            return False
+
     return True
 
 class SimpleStore:
