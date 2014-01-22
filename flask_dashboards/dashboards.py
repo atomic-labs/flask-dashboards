@@ -6,6 +6,7 @@ import logging
 import os
 import os.path
 import scss
+import traceback
 
 from flask import Blueprint, Response, abort, render_template, \
     render_template_string
@@ -44,8 +45,9 @@ class Dashboards(object):
 
             try:
                 f, pathname, description = imp.find_module(filename, [job_path])
-            except ImportError:
-                logger.error("Unable to load job (ImportError): %s" % filename)
+            except ImportError as e:
+                logger.error("Unable to load job: %s" % filename)
+                logger.debug(traceback.format_exc(e))
                 continue
 
             if f is None:
@@ -55,8 +57,9 @@ class Dashboards(object):
             try:
                 job_module_name = "dashboard_job_%s" % filename
                 mod = imp.load_module(job_module_name, f, pathname, description)
-            except ImportError:
+            except ImportError as e:
                 logger.error("Unable to load_module: %s" % filename)
+                logger.debug(traceback.format_exc(e))
                 continue
             finally:
                 f.close()
