@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 class Job:
     """Abstact Base Class for jobs. Child classes should implement:
     run() executes the task and returns an result object (see documentation in store)
@@ -16,6 +19,7 @@ class Job:
         self._store = store
 
     def _execute_and_store(self):
+        logger.info("Executing job: %s" % self.name())
         val = self.run()
         if not self._store.set(self.name(), val):
             raise Exception("Unable to store data")

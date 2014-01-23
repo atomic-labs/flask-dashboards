@@ -163,7 +163,7 @@ class Dashboards(object):
                 output.append("/* CSS: %s*/\n" % path)
                 if ".scss" in path:
                     logger.debug("Compiling Sass for %s " % path)
-                    contents = sass.compile(filename=path)
+                    contents = sass.compile(scss_file=path)
                 else:
                     with open(path) as f:
                         contents = f.read()
