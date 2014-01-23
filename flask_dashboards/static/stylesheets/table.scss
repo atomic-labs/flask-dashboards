@@ -1,0 +1,28 @@
+.dash-table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  width: 100%;
+  td, th {
+    border: 1px solid;
+    margin: 0;
+    padding: 5px;
+
+  }
+  .dash-very-high {
+    background-color: #5C9DFF;
+  }
+  .dash-high {
+    background-color: #85B6FF;
+  }
+  .dash-med {
+    background-color: #ADCEFF;
+  }
+  .dash-low {
+    background-color: #6666ff;
+    background-color: #D6E7FF;
+  }
+  .dash-very-low {
+    background-color: #aaaaff;
+    background-color: #EBF3FF;
+  }
+}

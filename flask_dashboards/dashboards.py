@@ -153,7 +153,7 @@ class Dashboards(object):
         @mod.route("/assets/application.css")
         def stylesheets():
             scripts = [
-                "stylesheets/application.scss",
+                "stylesheets/table.scss",
             ]
 
             output = []
