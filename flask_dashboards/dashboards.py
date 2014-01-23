@@ -31,7 +31,7 @@ class Dashboards(object):
             self.path = path
 
         self._start_scheduler(os.path.join(self.path, "jobs"))
-        self._load_dashboards()
+        self._load_dashboards(os.path.join(self.path, "boards"))
         self._create_views()
         self.app.register_blueprint(self.blueprint, url_prefix=url_prefix)
 
@@ -72,11 +72,11 @@ class Dashboards(object):
                                 (j.name(), j.schedule()))
                     self._scheduler.schedule(j)
 
-    def _load_dashboards(self):
-        logger.debug("Loading dashboards from: %s" % self.path)
-        paths = os.listdir(self.path)
+    def _load_dashboards(self, board_path):
+        logger.debug("Loading dashboards from: %s" % board_path)
+        paths = os.listdir(board_path)
         for p in paths:
-            fullpath = os.path.join(self.path, p)
+            fullpath = os.path.join(board_path, p)
             if os.path.isfile(fullpath) and p.endswith(".html"):
                 logger.debug("Loading dashboard: %s" % p)
                 with open(fullpath) as f:
