@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 
 class Dashboards(object):
     def __init__(self, app, path=None, url_prefix="/dashboards",
-                 store=store.SimpleStore):
+                 store=store.SimpleStore()):
         logger.debug("Initializing flask-dashboards")
         self.app = app
         self.blueprint = None
         self.basepath = None
         self.dashboards = {}
-        self._store = store()
+        self._store = store
 
         if path is None:
             self.path = os.path.join(app.root_path, "dashboards")

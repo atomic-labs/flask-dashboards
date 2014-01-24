@@ -1,4 +1,6 @@
+import json
 import logging
+import pylibmc
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +15,7 @@ def validate(data_set):
             return False
 
         if "key" not in ds:
+
             logger.debug("Missing required attribute: key")
             return False
 
@@ -45,6 +48,30 @@ class SimpleStore:
 
     def __contains__(self, key):
         return key in self._store
+
+    def __getitem__(self, key):
+        return self.get(key)
+
+    def __setitem__(self, key, value):
+        return self.set(key, value)
+
+class MemcachedStore:
+    def __init__(self, servers, *args, **kwargs):
+        self.mc = pylibmc.Client(servers, *args, **kwargs)
+
+    def set(self, key, value):
+        if not validate(value):
+            logger.warn("Invalid data for key: %s" % key)
+            return False
+
+        return self.mc.set(key.encode("utf-8"),
+                           json.dumps(value).encode("utf-8"))
+
+    def get(self, key):
+        return json.loads(self.mc[key.encode("utf-8")].decode("utf-8"))
+
+    def __contains__(self, key):
+        return key.encode("utf-8") in self.mc
 
     def __getitem__(self, key):
         return self.get(key)
