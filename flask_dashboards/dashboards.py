@@ -81,9 +81,7 @@ class Dashboards(object):
                 logger.debug("Loading dashboard: %s" % p)
                 with open(fullpath) as f:
                     self.dashboards[p[:-5]] = ("{% extends 'board.html' %}\n"
-                                               "{% block dashboard %}\n"
-                                               + f.read() +
-                                               "{% endblock %}")
+                                               + f.read())
 
     def _create_views(self):
         mod = Blueprint("dashboard", __name__,

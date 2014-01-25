@@ -15,6 +15,7 @@
 
     <script type="text/javascript" src="{{ url_for('.javascripts') }}"></script>
     <link rel="stylesheet" href="{{ url_for('.stylesheets') }}"/>
+    {% block headers %}{% endblock %}
   </head>
   <body>
     <div id="container">
