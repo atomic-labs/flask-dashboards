@@ -106,8 +106,11 @@ class Dashboards(object):
 
         @mod.route("/jobs/<name>/execute", methods=["POST"])
         def job_execute(name):
-            self._scheduler.execute(name)
-            return Response(status=200)
+            try:
+                self._scheduler.execute(name)
+                return Response(status=200)
+            except KeyError:
+                return Response("Job not found", status=404)
 
         @mod.route("/jobs/execute", methods=["POST"])
         def job_execute_all():
