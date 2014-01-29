@@ -1,12 +1,12 @@
 import coffeescript
-import imp
+import importlib.machinery
 import inspect
 import json
 import logging
 import os
 import os.path
 import scss
-import traceback
+import sys
 
 from flask import Blueprint, Response, abort, render_template, \
     render_template_string
@@ -37,32 +37,17 @@ class Dashboards(object):
 
     def _start_scheduler(self, job_path):
         self._scheduler = scheduler.SimpleScheduler()
+        sys.path.append(job_path)
         for p in os.listdir(job_path):
             filename, ext = os.path.splitext(p)
             if ext != ".py":
                 continue
             logger.info("Loading job module: %s" % filename)
 
-            try:
-                f, pathname, description = imp.find_module(filename, [job_path])
-            except ImportError as e:
-                logger.error("Unable to load job: %s" % filename)
-                logger.debug(traceback.format_exc(e))
-                continue
-
-            if f is None:
-                logger.error("Unable to load job: %s" % filename)
-                continue
-
-            try:
-                job_module_name = "dashboard_job_%s" % filename
-                mod = imp.load_module(job_module_name, f, pathname, description)
-            except ImportError as e:
-                logger.error("Unable to load_module: %s" % filename)
-                logger.debug(traceback.format_exc(e))
-                continue
-            finally:
-                f.close()
+            job_module_name = "dashboard_jobs.%s" % filename
+            loader = importlib.machinery.SourceFileLoader(job_module_name,
+                                                          os.path.join(job_path, p))
+            mod = loader.load_module(job_module_name)
 
             for name, obj in inspect.getmembers(mod):
                 if (inspect.isclass(obj) and issubclass(obj, job.Job)
