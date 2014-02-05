@@ -91,11 +91,10 @@ class Dashboards(object):
 
         @mod.route("/jobs/<name>/execute", methods=["POST"])
         def job_execute(name):
-            try:
-                self._scheduler.execute(name)
-                return Response(status=200)
-            except KeyError:
+            if name not in self._scheduler.schedules():
                 return Response("Job not found", status=404)
+            self._scheduler.execute(name)
+            return Response(status=200)
 
         @mod.route("/jobs/execute", methods=["POST"])
         def job_execute_all():
