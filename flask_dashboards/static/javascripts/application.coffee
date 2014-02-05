@@ -16,6 +16,7 @@ create_chart = (div, data) ->
         switch div.getAttribute "dash-chart-type"
             when "bar" then chart = nv.models.discreteBarChart()
             when "line" then chart = nv.models.lineChart()
+            when "stacked-area" then chart = nv.models.stackedAreaChart().showControls(false)
             else
                 console.log "Unknown chart type: " +
                     div.getAttribute "dash-chart-type"
@@ -83,7 +84,7 @@ get_data = (div) ->
 
     request = $.get "../jobs/" + data_name + "/data", "",
         (data) ->
-            if div.getAttribute("dash-chart-type") in ["bar", "line"]
+            if div.getAttribute("dash-chart-type") in ["bar", "line", "stacked-area"]
                 create_chart div, data
             else
                 create_table div, data
