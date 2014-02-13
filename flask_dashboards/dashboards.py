@@ -54,7 +54,7 @@ class Dashboards(object):
                     and not obj == job.Job):
                     j = obj(self._store)
                     logger.info("Scheduling job: %s, with schedule: %s" %
-                                (j.name(), j.schedule()))
+                                (j.name, j.schedule))
                     self._scheduler.schedule(j)
 
     def _load_dashboards(self, board_path):
