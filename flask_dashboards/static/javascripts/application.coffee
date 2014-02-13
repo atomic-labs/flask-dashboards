@@ -37,20 +37,19 @@ create_table = (div, data) ->
     console.log "Creating table"
     table = $ "<table class='dash-table'>"
 
-    series = data[0]
     row = $ "<tr>"
-    row.append( $ "<th>" + series.key + "</th>")
-    for val in series.values
-        cell = $ "<th>" + val + "</th>"
+    for s in data
+        cell = $ "<th>" + s.key + "</th>"
         row.append cell
     table.append row
 
-    for series in data[1..]
+    rows = (Math.max.apply null, (s.values.length for s in data)) - 1
+    for i in [0..rows]
         row = $ "<tr>"
-        row.append( $ "<td>" + series.key + "</td>")
-        for val in series.values
-            cell = $ "<td>" + val + "</td>"
-            row.append cell
+        for s in data
+            if s.values.length > i
+                cell = $ "<td>" + s.values[i] + "</td>"
+                row.append cell
         table.append row
 
     $(div).append table
