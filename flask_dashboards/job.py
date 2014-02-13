@@ -1,6 +1,7 @@
 import csv
 import io
 import logging
+import os
 import smtplib
 from datetime import date
 from email.encoders import encode_base64
@@ -11,13 +12,10 @@ from email.utils import formatdate
 
 logger = logging.getLogger(__name__)
 
-SEND_FROM = "ever_stats@atomicmgmt.com"
-SEND_TO = "ben@atomicmgmt.com"
-
 def email_data(title, data):
     msg = MIMEMultipart()
-    msg['From'] = SEND_FROM
-    msg['To'] = SEND_TO
+    msg['From'] = os.environ["DASHBOARD_EMAIL_FROM"]
+    msg['To'] = os.environ["DASHBOARD_EMAIL_TO"]
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = title
     msg.attach( MIMEText('') )
@@ -54,9 +52,12 @@ def email_data(title, data):
     msg.attach(part)
 
     logger.debug("Sending email: %s" % title)
-    smtp = smtplib.SMTP_SSL("smtp.gmail.com")
-    smtp.login(SEND_FROM, "ever_stats")
-    smtp.sendmail(SEND_FROM, SEND_TO, msg.as_string())
+    smtp = smtplib.SMTP_SSL(os.environ["DASHBOARD_EMAIL_SMTP_SERVER"])
+    smtp.login(os.environ["DASHBOARD_EMAIL_FROM"],
+               os.environ["DASHBOARD_EMAIL_PASSWORD"])
+    smtp.sendmail(os.environ["DASHBOARD_EMAIL_FROM"],
+                  os.environ["DASHBOARD_EMAIL_TO"],
+                  msg.as_string())
     smtp.quit()
 
 class Job:
