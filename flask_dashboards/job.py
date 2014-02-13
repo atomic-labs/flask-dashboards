@@ -1,9 +1,61 @@
+import csv
+import io
 import logging
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email.utils import formatdate
+from email.encoders import encode_base64
+
 logger = logging.getLogger(__name__)
+
+SEND_FROM = "ever_stats@atomicmgmt.com"
+SEND_TO = "ben@atomicmgmt.com"
+
+def email_data(title, data):
+    msg = MIMEMultipart()
+    msg['From'] = SEND_FROM
+    msg['To'] = SEND_TO
+    msg['Date'] = formatdate(localtime=True)
+    msg['Subject'] = title
+    msg.attach( MIMEText('') )
+
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow([s["key"] for s in data])
+    rows = max((len(s["values"]) for s in data))
+    for i in range(rows):
+        row = []
+        for s in data:
+            if len(s["values"]) > i:
+                elem = s["values"][i]
+                if type(elem) == tuple:
+                    for e in elem:
+                        row.append(e)
+                else:
+                    row.append(elem)
+            else:
+                row.append("")
+        writer.writerow(row)
+
+    part = MIMEBase("text", "csv")
+    buf.seek(0)
+    part.set_payload(buf.read())
+    encode_base64(part)
+    part.add_header("Content-Disposition",
+                    'attachment; filename="%s.csv"' % title)
+    msg.attach(part)
+
+    smtp = smtplib.SMTP_SSL("smtp.gmail.com")
+    smtp.login(SEND_FROM, "ever_stats")
+    smtp.sendmail(SEND_FROM, SEND_TO, msg.as_string())
+    smtp.quit()
 
 class Job:
     """Abstact Base Class for jobs. Child classes should implement:
-    run() executes the task and returns an result object (see documentation in store)
+    run() executes the task and returns an result object.
+    email() returns True if the results of the job should be emailed as a csv.
     name() returns the string name of the job. Job names must be uniqute.
     schedule() returns an object with the following fields (all optional):
         year           4-digit year number
@@ -14,12 +66,27 @@ class Job:
         hour           hour (0-23)
         minute         minute (0-59)
         second         second (0-59)
+
+    Result Object Format
+    ====================
+    A result object should be a list of dicts. The dict must have keys
+    "key" and "values". "key" is a name for the series of
+    data. "values" is a list of elements. For tabular data, each row
+    should be it's own dict, with each elements of values filling in
+    columns. For plotted data, values should be a list of two element
+    tuples.
     """
     def __init__(self, store):
         self._store = store
+
+    def email(self):
+        return False
 
     def _execute_and_store(self):
         logger.info("Executing job: %s" % self.name())
         val = self.run()
         if not self._store.set(self.name(), val):
             raise Exception("Unable to store data")
+
+        if self.email():
+            email_data(self.name(), val)
