@@ -10,6 +10,7 @@ set_conversion_funcs = (chart, data) ->
             chart.x (d) -> d[0]
 
     chart.y (d) -> d[1]
+    chart.yAxis.tickFormat d3.format(",")
 
 create_chart = (div, data) ->
     nv.addGraph ->
