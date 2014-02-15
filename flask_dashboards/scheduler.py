@@ -1,5 +1,6 @@
 import logging
 from apscheduler.scheduler import Scheduler
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -26,4 +27,5 @@ class SimpleScheduler:
         return {job.name: job.schedule for job in self._jobs.values()}
 
     def execute(self, name):
-        return self._jobs[name]._execute_and_store()
+        return self._sched.add_date_job(self._jobs[name]._execute_and_store,
+                                        datetime.now() + timedelta(seconds=1))

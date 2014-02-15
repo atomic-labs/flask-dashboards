@@ -94,7 +94,7 @@ class Dashboards(object):
             if name not in self._scheduler.schedules():
                 return Response("Job not found", status=404)
             self._scheduler.execute(name)
-            return Response(status=200)
+            return Response(status=202)
 
         @mod.route("/jobs/execute", methods=["POST"])
         def job_execute_all():
